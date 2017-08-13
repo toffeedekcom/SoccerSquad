@@ -1,0 +1,165 @@
+//
+//  PayWaiting.swift
+//  Project2
+//
+//  Created by toffee on 7/3/2560 BE.
+//  Copyright © 2560 Scott. All rights reserved.
+//
+
+import UIKit
+import AlamofireImage
+import Alamofire
+
+class PayWaiting: UITableViewController {
+    
+    var bookId = ""
+    var fid = ""
+    var key = ""
+
+    
+    @IBOutlet weak var imageField: UIImageView!
+    @IBOutlet weak var nameField: UILabel!
+    
+    @IBOutlet weak var imageType: UIImageView!
+    @IBOutlet weak var typeMiniField: UILabel!
+    @IBOutlet weak var startTime: UILabel!
+    @IBOutlet weak var stopTime: UILabel!
+    @IBOutlet weak var date: UILabel!
+    @IBOutlet weak var status: UILabel!
+    @IBOutlet weak var price: UILabel!
+    @IBOutlet weak var pledge: UILabel!
+    
+    @IBOutlet weak var btnPay: UIButton!
+    @IBOutlet weak var btnBankAccount: UIButton!
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        print("FID = \(self.fid)")
+        print("bookId = \(self.bookId)")
+       
+            self.doPayWaiting()
+        
+        
+    }
+    
+    func doPayWaiting(){
+      
+      print("Hitory")
+        self.btnPay.layer.cornerRadius = 12
+        self.btnBankAccount.layer.cornerRadius = 12
+        let urlStatusBook = "https://nickgormanacademy.com/soccerSquat/booking/StatusBook.php"
+        var parame:[String:String] = ["bookId": self.bookId]
+        Alamofire.request(.GET,urlStatusBook,parameters: parame,encoding: .URL).validate()
+            .responseJSON{(response) in
+                   print("mmmm1")
+                switch response.result {
+                case .Success:
+                    print("mmmm2")
+                    var JSON = [AnyObject]()
+                    JSON = response.result.value as! [AnyObject]!
+                    print("json = \(JSON)")
+                    for value in JSON {
+                       print("mmmm3")
+                        self.nameField.text  = (value["fname"] as? String)!
+                        self.startTime.text  = (value["bstartime"] as? String)!
+                        self.stopTime.text = (value["bstoptime"] as? String)!
+                        self.date.text = (value["bdate"] as? String)!
+                        self.status.text = (value["bstatus"] as? String)!
+                        self.typeMiniField.text = (value["mnf_type"] as? String)!
+                        self.price.text = (value["bprice"] as? String)!
+                        self.pledge.text = (value["bpledge"] as? String)!
+                        
+                        
+                        var urlImageField = "https://nickgormanacademy.com/soccerSquat/owner/FieldManager/" + (value["fimage"] as? String)!
+                        
+                        
+                        self.getNetworkImage(urlImageField) { (image) in //เรียก เมอธอทดึงรูป
+                            self.imageField.image = image
+                            self.imageField.contentMode = .ScaleAspectFit
+                            self.imageField.layer.borderWidth = 1.0
+                            self.imageField.layer.masksToBounds = false
+                            self.imageField.layer.cornerRadius = self.imageField.frame.size.height/2
+                            self.imageField.clipsToBounds = true
+                        }
+                        
+                        
+                        var urlImageTypeField = "https://nickgormanacademy.com/soccerSquat/owner/FieldManager/" + (value["mnf_image"] as? String)!
+                        
+                        
+                        self.getNetworkImage(urlImageTypeField) { (image) in //เรียก เมอธอทดึงรูป
+                            self.imageType.image = image
+                            self.imageType.contentMode = .ScaleAspectFit
+                            self.imageType.layer.borderWidth = 1.0
+                            self.imageType.layer.masksToBounds = false
+                            self.imageType.layer.cornerRadius = self.imageType.frame.size.height/2
+                            self.imageType.clipsToBounds = true
+                        }
+                        
+                        
+                        
+                        
+                        
+                    }
+                    self.tableView.reloadData()
+                case .Failure(let error):
+                    print(error)
+                }
+                
+                
+                
+        }
+        
+        
+    }
+    
+
+    
+    
+    @IBAction func payPeldge(sender: AnyObject) {
+        
+        performSegueWithIdentifier("paypeldge", sender: self)
+    }
+    
+    @IBAction func bankAcount(sender: AnyObject) {
+        performSegueWithIdentifier("bankaccount", sender: self)
+    }
+    
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    func getNetworkImage(urlString: String, completion: (UIImage? -> Void)) -> (Request) { //ดึงรุปจากserver
+        return Alamofire.request(.GET, urlString).responseImage { (response) -> Void in
+            guard let image = response.result.value else { return }
+            //print(image)
+            completion(image)
+        }
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        
+        if (segue.identifier == "paypeldge") {
+            
+            
+            let DestViewController = segue.destinationViewController as! UploadSlip
+            
+            DestViewController.bookId = bookId
+            
+        }
+        else if(segue.identifier == "bankaccount"){
+            let DestViewController = segue.destinationViewController as! BankAccount
+            
+            DestViewController.fid = fid
+        }
+        
+    }
+    
+   
+
+
+    
+    
+
+}

@@ -1,9 +1,9 @@
 //
 //  ViewController.swift
-//  SoccerSquad
+//  Project2
 //
-//  Created by CSmacmini on 7/18/2560 BE.
-//  Copyright © 2560 Project. All rights reserved.
+//  Created by toffee on 6/7/2560 BE.
+//  Copyright © 2560 Scott. All rights reserved.
 //
 
 import UIKit

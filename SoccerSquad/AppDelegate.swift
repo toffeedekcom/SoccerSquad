@@ -1,23 +1,78 @@
 //
 //  AppDelegate.swift
-//  SoccerSquad
+//  ParseDemo
 //
-//  Created by CSmacmini on 7/18/2560 BE.
-//  Copyright © 2560 Project. All rights reserved.
+//  Created by Rumiya Murtazina on 7/28/15.
+//  Copyright (c) 2015 abearablecode. All rights reserved.
 //
 
 import UIKit
+import Alamofire
+import FBSDKLoginKit
+import IQKeyboardManagerSwift
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate  {
 
     var window: UIWindow?
+    
+    
+    func application(application: UIApplication, willFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]?) -> Bool {
+        
+        application.applicationIconBadgeNumber = 0
+        return true
+    }
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
-        return true
+        
+        var navigationBarAppearace = UINavigationBar.appearance()
+        
+        //IQKeyboardManager custom
+        IQKeyboardManager.sharedManager().enable = true
+//        IQKeyboardManager.sharedManager().enableAutoToolbar = false
+        
+        //Set Status Colour
+        UIApplication.sharedApplication().statusBarStyle = UIStatusBarStyle.LightContent
+        
+        //Set navigation bar tint
+        navigationBarAppearace.tintColor = UIColor.whiteColor()
+        
+        //Set Navigation bar title colour
+        navigationBarAppearace.barTintColor = UIColor(red:0.13, green:0.81, blue:0.68, alpha:1.0)
+//        (red:0.13, green:0.81, blue:0.68, alpha:1.0)
+        
+        // change navigation item title color
+        navigationBarAppearace.titleTextAttributes = [NSForegroundColorAttributeName:UIColor.whiteColor()]
+        
+        //Connect Facebook
+        FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
+        
+        //Notification Set-up
+        if(UIApplication.instancesRespondToSelector(Selector("registerUserNotificationSettings:"))) {
+            UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge] , categories: nil))
+        }
+        
+       return true
     }
+
+    
+//    Function Connect Facebook
+    func application(application : UIApplication, openURL url: NSURL, sourceApplication: String?,annotation: AnyObject) -> Bool {
+        var handled: Bool = FBSDKApplicationDelegate.sharedInstance().application(application, openURL: url, sourceApplication: sourceApplication, annotation: annotation)
+        
+        return handled
+    }
+
+    func application(application: UIApplication, didReceiveLocalNotification notification: UILocalNotification) {
+        
+        application.applicationIconBadgeNumber = 0
+//        let tabbarController = self.window?.rootViewController as! UITabBarController
+//        tabbarController.selectedIndex = 4
+        
+    }
+    
+    
 
     func applicationWillResignActive(application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
